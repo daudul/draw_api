@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\UpdateEventRequest;
+use App\Http\Resources\EventResource;
 use App\Models\Event;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
@@ -15,18 +16,16 @@ class EventController extends Controller
 
     /**
      * Display a listing of the resource.
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        try {
+            $eventLists = EventResource::collection(Event::all());
+            return self::successWithData(message: 'Event data fetch successfully', data: $eventLists, httpStatusCode: Response::HTTP_OK);
+        }catch (\Exception $e){
+            return self::error(message: $e->getMessage(), httpStatusCode: Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -47,7 +46,7 @@ class EventController extends Controller
             $event->end_date = (new Carbon($request->end_date))->format('Y-m-d H:i:s');
             $event->save();
 
-            return self::success(message: "Event has been create successfully", httpStatusCode: Response::HTTP_CREATED);
+            return self::successMessage(message: "Event has been create successfully", httpStatusCode: Response::HTTP_CREATED);
         }catch (\Exception $e){
             return self::error(message: $e->getMessage(), httpStatusCode: Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -56,9 +55,14 @@ class EventController extends Controller
     /**
      * Display the specified resource.
      */
+
+    /**
+     * @param Event $event
+     * @return EventResource
+     */
     public function show(Event $event)
     {
-        //
+        return new EventResource($event);
     }
 
     /**

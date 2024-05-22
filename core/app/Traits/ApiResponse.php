@@ -4,12 +4,20 @@ namespace App\Traits;
 
 trait ApiResponse
 {
-    public static function success(string $message, array $data = [], int $httpStatusCode)
+    public static function successWithData(string $message, object $data, int $httpStatusCode)
     {
         return response()->json([
             'success' => true,
             'message' => $message,
             'data' => $data,
+        ], $httpStatusCode);
+    }
+
+    public static function successMessage(string $message, int $httpStatusCode)
+    {
+        return response()->json([
+            'success' => true,
+            'message' => $message,
         ], $httpStatusCode);
     }
 

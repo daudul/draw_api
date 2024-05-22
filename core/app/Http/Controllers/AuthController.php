@@ -23,7 +23,7 @@ final class AuthController extends Controller
         try {
             $user = $this->create(data: $request->all());
 
-            return self::success(message: 'User Create Successfully', data: $user->toArray(), httpStatusCode: Response::HTTP_CREATED);
+            return self::successWithData(message: 'User Create Successfully', data: $user, httpStatusCode: Response::HTTP_CREATED);
         } catch (\Exception $e){
             return self::error(message: $e->getMessage(), httpStatusCode: Response::HTTP_INTERNAL_SERVER_ERROR);
         }
