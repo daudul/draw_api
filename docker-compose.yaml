@@ -1,0 +1,73 @@
+version: "3.7"
+
+networks:
+  draw_api:
+    driver: bridge
+
+services:
+  app:
+    build:
+      args:
+        user: user
+        uid: 1000
+      context: ./
+      dockerfile: docker/php/Dockerfile
+    container_name: php
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    networks:
+      - draw_api
+
+  nginx:
+    build:
+      dockerfile: docker/nginx/Dockerfile
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d/
+    depends_on:
+      - app
+      - db
+    networks:
+      - draw_api
+
+  db:
+    image: mysql:8.0
+    container_name: draw_mysql
+    volumes:
+      - db-data:/var/lib/mysql
+    tty: true
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret
+      MYSQL_DATABASE: draw_api
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+    networks:
+      - draw_api
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: draw_phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: db
+      PMA_USER: user
+      PMA_PASSWORD: secret
+    networks:
+      - draw_api
+    depends_on:
+      - db
+
+volumes:
+  db-data:
