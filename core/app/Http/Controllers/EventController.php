@@ -6,6 +6,7 @@ use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\UpdateEventRequest;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
+use App\Services\FileUpload;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
@@ -36,6 +37,13 @@ class EventController extends Controller
      */
     public function store(StoreEventRequest $request)
     {
+        //$fileUpload = new FileUpload();
+
+        return response()->json(FileUpload::DISK_TYPE);
+
+        var_dump($fileUpload->getStoreType());
+
+        exit();
         try {
             $event = new Event();
             $event->name = $request->name;

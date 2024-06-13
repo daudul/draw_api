@@ -7,6 +7,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Response;
+use Illuminate\Validation\Rules\File;
 
 class StoreEventRequest extends FormRequest
 {
@@ -31,6 +32,7 @@ class StoreEventRequest extends FormRequest
             'event_type' => 'required',
             'start_date' => 'required',
             'end_date' => 'required',
+            'image_url' => File::types($this->acceptImageType())->max(5 * 1024),
         ];
     }
 
@@ -45,5 +47,12 @@ class StoreEventRequest extends FormRequest
             self::validatedError(message: $validator->errors()->toArray(),
                 httpStatusCode: Response::HTTP_UNPROCESSABLE_ENTITY)
         );
+    }
+
+    protected function acceptImageType():array
+    {
+        return[
+            'jpeg', 'png', 'jpg', 'gif', 'svg'
+        ];
     }
 }
